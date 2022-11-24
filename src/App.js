@@ -1,40 +1,43 @@
-import { Link, Route, Routes } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function App() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((json) => setUsers(json))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="App">
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-        </ul>
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="dashboard" element={<Dashboard />}></Route>
-      </Routes>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <h1>Users</h1>
+          <table border={1}>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+              </tr>
+            ))}
+          </table>
+        </>
+      )}
     </div>
   );
-}
-
-function Home() {
-  const navigate = useNavigate();
-
-  return (
-    <button
-      onClick={() => {
-        navigate("/dashboard");
-      }}
-    >
-      Go to dashboard
-    </button>
-  );
-}
-
-function Dashboard() {
-  return <div>Dashboard</div>;
 }
 
 export default App;
